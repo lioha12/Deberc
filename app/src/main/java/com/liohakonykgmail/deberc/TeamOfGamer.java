@@ -7,6 +7,7 @@ package com.liohakonykgmail.deberc;
 public class TeamOfGamer {
     private GamerDeberc mGamer1;
     private GamerDeberc mGamer2;
+    private boolean isWin;
 
     public TeamOfGamer(GamerDeberc gamer1, GamerDeberc gamer2){
         this.mGamer1 = gamer1;
@@ -23,5 +24,13 @@ public class TeamOfGamer {
 
     public String getNameOfTeam(){
         return mGamer1.getName() + "/" + mGamer2.getName();
+    }
+
+    public boolean isWin() {
+        return isWin;
+    }
+
+    public void setWin(boolean win) {
+        isWin = win;
     }
 }

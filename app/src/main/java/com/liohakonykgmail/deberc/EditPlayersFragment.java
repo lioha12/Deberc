@@ -107,7 +107,7 @@ public class EditPlayersFragment extends Fragment {
                             mGamerDeberc2 = gd;
                             mTeam1 = new TeamOfGamer(mGamerDeberc1, mGamerDeberc2);
                             mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
-                        }else {
+                        }else {//mGlobalPoints.setText(game.getGameWinPoints());
                             mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
                         }
                     }
@@ -153,7 +153,6 @@ public class EditPlayersFragment extends Fragment {
         mBtnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity().getBaseContext(), DebercActivity.class);
                 int i = 0;
                 if(mRadioButton500.isChecked()) {
                     i = 501;
@@ -161,19 +160,13 @@ public class EditPlayersFragment extends Fragment {
                 else if(mRadioButton1000.isChecked()){
                     i = 1001;
                 }
-                else Toast.makeText(getActivity(), "Не выбран размер игры", Toast.LENGTH_LONG).show();
+                else {
+                    Toast.makeText(getActivity(), "Не выбран размер игры", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 mGlobalGame = new GlobalGame(mTeam1, mTeam2, i);
 
                 mCallbacks.onGameStarted(mGlobalGame);
-
-                    intent.putExtra(GlobalGame.EXTRA_GAME_WIN_POINTS, i);
-                    intent.putExtra(EXTRA_PLAYER1, mGamerDeberc1.getName());
-                    intent.putExtra(EXTRA_PLAYER2, mGamerDeberc2.getName());
-                    intent.putExtra(EXTRA_PLAYER3, mGamerDeberc3.getName());
-                    intent.putExtra(EXTRA_PLAYER4, mGamerDeberc4.getName());
-                //}catch (Exception e){Toast.makeText(getActivity(), "Что-то не так", Toast.LENGTH_LONG).show();}
-
-                getActivity().startActivity(intent);
             }
         });
         return v;

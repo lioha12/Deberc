@@ -21,10 +21,15 @@ public class EditPlayersActivity extends SingleFragmentActivity implements EditP
         return EditPlayersFragment.EDIT_PLAYERS_TAG;
     }
 
+    @Override
+    protected void sendArguments(Fragment fragment) {
+
+    }
+
    /* @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-    }*/
+    }
 
     public void reciveAndSendDataToDebercActivity(){
         Intent intent  = getIntent();
@@ -41,11 +46,11 @@ public class EditPlayersActivity extends SingleFragmentActivity implements EditP
         intent1.putExtra(EditPlayersFragment.EXTRA_PLAYER3, name3);
         intent1.putExtra(EditPlayersFragment.EXTRA_PLAYER4, name4);
         startActivity(intent1);
-    }
+    }*/
 
     @Override
     public void onGameStarted(GlobalGame globalGame) {
-        if(getSupportFragmentManager().findFragmentByTag(DebercFragment.DEBERC_FRAGMENT_TAG) == null){
+        //if(getSupportFragmentManager().findFragmentByTag(DebercFragment.DEBERC_FRAGMENT_TAG) == null) {
             Intent intent = new Intent(this, DebercActivity.class);
             intent.putExtra(GlobalGame.EXTRA_GAME_WIN_POINTS, globalGame.getGameWinPoints());
             intent.putExtra(EditPlayersFragment.EXTRA_PLAYER1, globalGame.getmTeam1().getmGamer1().getName());
@@ -53,10 +58,11 @@ public class EditPlayersActivity extends SingleFragmentActivity implements EditP
             intent.putExtra(EditPlayersFragment.EXTRA_PLAYER3, globalGame.getmTeam2().getmGamer1().getName());
             intent.putExtra(EditPlayersFragment.EXTRA_PLAYER4, globalGame.getmTeam2().getmGamer2().getName());
             startActivity(intent);
-        }else{
+       /* }else{
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
+            DebercFragment fragment = new DebercFragment();
+        }*/
 
-        }
     }
 }

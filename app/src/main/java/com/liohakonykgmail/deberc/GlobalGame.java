@@ -15,6 +15,8 @@ public class GlobalGame {
 
     public static final String EXTRA_GAME_WIN_POINTS = "game_win_points";
     private int gameWinPoints;
+    private int team1Points = 0;
+    private int team2Points = 0;
 
     private TeamOfGamer mTeam1;
     private TeamOfGamer mTeam2;
@@ -33,7 +35,6 @@ public class GlobalGame {
 
         mId = UUID.randomUUID();
         mDate = new Date(System.currentTimeMillis());
-
     }
 
     public int getGameWinPoints() {
@@ -61,5 +62,27 @@ public class GlobalGame {
 
     public TeamOfGamer getmTeam2() {
         return mTeam2;
+    }
+
+    public void setTeam1Points(int newPoints){
+        team1Points = team1Points + newPoints;
+        if(team1Points >= gameWinPoints){
+            mTeam1.setWin(true);
+        }
+    }
+
+    public void setTeam2Points(int newPoints){
+        team2Points = team2Points + newPoints;
+        if(team1Points >= gameWinPoints){
+            mTeam2.setWin(true);
+        }
+    }
+
+    public int getTeam1Points() {
+        return team1Points;
+    }
+
+    public int getTeam2Points() {
+        return team2Points;
     }
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class DebercGame {
 
-    public static final String[] gamePoints = new String[]{"162", "182", "202", "212", "222", "232", "242",
+    public static final String[] gamePoints = new String[]{"", "162", "182", "202", "212", "222", "232", "242",
             "252", "262", "272", "282", "292", "302"};
 
     private int currentGame;
@@ -20,17 +20,21 @@ public class DebercGame {
         this.calculatedPoints = calculatedPoints;
     }
 
-    public void gameResult(DebercGame game) {
+    public int gameResult(DebercGame game) {
         if(game.currentGame != 0&&game.calculatedPoints != 0){
             game.otherPoints = game.currentGame - game.calculatedPoints;
-        }else return;
+            return game.otherPoints;
+        }else return 0;
     }
 
     public void setCurrentGame(int currentGame) {
         this.currentGame = currentGame;
     }
 
-    public void setCalculatedPoints(int calculatedPoints) {
+    public void setCalculatedPoints(int calculatedPoints){
+        if(calculatedPoints > currentGame){
+            return;
+        }else
         this.calculatedPoints = calculatedPoints;
     }
 

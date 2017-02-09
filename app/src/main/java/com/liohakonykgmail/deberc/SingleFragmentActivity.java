@@ -1,5 +1,6 @@
 package com.liohakonykgmail.deberc;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
     protected abstract String getTAG();
+    protected abstract void sendArguments(Fragment fragment);
 
     @LayoutRes
     protected int getLayoutResId()
@@ -34,6 +36,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         if(fragment == null)
         {
             fragment = createFragment();
+            sendArguments(fragment);
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment, getTAG())
                     .commit();
