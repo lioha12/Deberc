@@ -11,4 +11,6 @@
     <string name="ok">Готово</string>
     <string name="cancel">Отменить</string>
     <string name="write">Записать</string>
+    <string name="reset">Сбросить команды</string>
+    <string name="delete_gamers">Очистить список игроков</string>
 </resources>

@@ -15,8 +15,8 @@ public class GlobalGame {
 
     public static final String EXTRA_GAME_WIN_POINTS = "game_win_points";
     private int gameWinPoints;
-    private int team1Points = 0;
-    private int team2Points = 0;
+    private int team1Points;
+    private int team2Points;
 
     private TeamOfGamer mTeam1;
     private TeamOfGamer mTeam2;
@@ -73,7 +73,7 @@ public class GlobalGame {
 
     public void setTeam2Points(int newPoints){
         team2Points = team2Points + newPoints;
-        if(team1Points >= gameWinPoints){
+        if(team2Points >= gameWinPoints){
             mTeam2.setWin(true);
         }
     }

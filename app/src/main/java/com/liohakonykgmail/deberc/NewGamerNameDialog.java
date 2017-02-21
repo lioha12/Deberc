@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +32,26 @@ public class NewGamerNameDialog extends DialogFragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        GamerDeberc gamerDeberc = new GamerDeberc(mEditTextNewGamersName.getText().toString());
-                        GamerDeberc.getGamers().add(gamerDeberc);
+
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                GamerDeberc gamerDeberc = new GamerDeberc(mEditTextNewGamersName.getText().toString());
+                                GamerDeberc.addGamers(gamerDeberc, new GamerDeberc.GamersDBHelper(getActivity()));
+                            }
+                        });
+
+
+                        thread.start();
+                        try {
+                            thread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         EditPlayersFragment fragment = (EditPlayersFragment)getFragmentManager().findFragmentByTag(EditPlayersFragment.EDIT_PLAYERS_TAG);
-                        fragment.updateView();
+                        fragment.updateSpinner();
                     }
+
                 });
         return builder.create();
     }

@@ -8,6 +8,7 @@ import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 public class DebercFragment extends Fragment {
 
     public static final String DEBERC_FRAGMENT_TAG = "deberc_fragment";
+    public static final String LOG_TAG = "deber";
     private GlobalGame game;
     private DebercGame currentGame;
     private Spinner mSpinnerGameCount;
@@ -135,8 +137,13 @@ public class DebercFragment extends Fragment {
                 String team1Points = editCalculatedPoints.getText().toString();
                 String team2Points = mOtherPointsTextView.getText().toString();
 
-                game.setTeam1Points(Integer.parseInt(team1Points));
-                game.setTeam2Points(Integer.parseInt(team2Points));
+               try {
+                    game.setTeam1Points(Integer.parseInt(team1Points));
+                    game.setTeam2Points(Integer.parseInt(team2Points));
+                }catch (Exception e){
+                    Toast.makeText(getActivity(), "Не указаны все очки!", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 mTVtotalTeam1Points.setText(String.valueOf(game.getTeam1Points()));
                 mTVtotalTeam2Points.setText(String.valueOf(game.getTeam2Points()));
@@ -170,12 +177,41 @@ public class DebercFragment extends Fragment {
                 layout.addView(tvTeam2);
 
                 mLayout.addView(layout);
-
+                Log.d(LOG_TAG, "game win -- " + String.valueOf(game.getGameWinPoints()) + "team1 --" + String.valueOf(game.getmTeam1().isWin()) + "/r" +
+                "team2 -- " + String.valueOf(game.getmTeam2().isWin()));
                 currentGame = new DebercGame(0, 0);
 
-                mSpinnerGameCount.setSelection(0);     //reset spinner, textView and editText
+                mSpinnerGameCount.setSelection(0);                                  //reset spinner, textView and editText
                 editCalculatedPoints.setText("");
                 mOtherPointsTextView.setText("");
+
+                if (game.getmTeam1().isWin()||game.getmTeam2().isWin()){
+
+                    Log.d(LOG_TAG, "Who is win");
+
+                    if(game.getTeam1Points() > game.getTeam2Points())
+                    {
+                        Log.d(LOG_TAG, "team1 is win");
+                        Toast.makeText(getActivity(), "Победили " + game.getmTeam1().getNameOfTeam(), Toast.LENGTH_LONG).show();
+                        try {
+                            Thread.currentThread().sleep(5000);
+                        } catch (InterruptedException e) {
+                            //e.printStackTrace();
+                        }
+                        getActivity().finish();
+                    }else {
+                        Log.d(LOG_TAG, "team2 is win");
+                        Toast.makeText(getActivity(), "Победили " + game.getmTeam2().getNameOfTeam(), Toast.LENGTH_LONG).show();
+                        try {
+                            Thread.currentThread().sleep(5000);
+                        } catch (InterruptedException e) {
+                            //e.printStackTrace();
+                        }
+                        getActivity().finish();
+                    }
+                }
+
+
             }
         });
 
