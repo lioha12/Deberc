@@ -2,6 +2,7 @@ package com.liohakonykgmail.deberc;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.app.Activity.RESULT_OK;
+
 
 /**
  * Created by lioha on 18.01.17.
@@ -32,7 +35,7 @@ import android.widget.Toast;
 
 public class EditPlayersFragment extends Fragment {
 
-    public Context appContext = getContext();
+    //public Context appContext = getContext();
 
     public static final String LOG_TAG_DEBERC = "deberc";
 
@@ -42,12 +45,16 @@ public class EditPlayersFragment extends Fragment {
     public static final String EXTRA_PLAYER2 = "player2";
     public static final String EXTRA_PLAYER3 = "player3";
     public static final String EXTRA_PLAYER4 = "player4";
+    private static final String EXTRA_TEAM1_NAME = "team1";
+    private static final String EXTRA_TEAM2_NAME = "team2";
 
     private TextView mTeam1TextView;
     private TextView mTeam2TextView;
     private Button mBtnNewGamer;
     private Button mResetButton;
     private Button mBtnStart;
+    private Button mBtnTeam1Choice;
+    private Button mBtnTeam2Choice;
     private Spinner mSpinnerForTeam1;
     private Spinner mSpinnerForTeam2;
     private TextView mTextViewNamesTeam1;
@@ -64,9 +71,12 @@ public class EditPlayersFragment extends Fragment {
     private GlobalGame mGlobalGame;
 
     private ArrayAdapter<String> mAdapter;
+    public static EditPlayersFragment fragment;
 
     public interface Callbacks{
         void onGameStarted(GlobalGame globalGame);
+        void onTeam1ChoiceButtonPressed();
+        void onTeam2ChoiceButtonPressed();
     }
 
     @Override
@@ -79,15 +89,59 @@ public class EditPlayersFragment extends Fragment {
             public void run() {
                 try {
                     GamerDeberc.loadGamers(new GamerDeberc.GamersDBHelper(getActivity()));
-                }catch (Exception e){}
+                    TeamOfGamer.loadTeams(new TeamOfGamer.TeamsDBHelper(getActivity()));
+                }catch (Exception e){
+                    Log.d("debe", "onAttach EdPF");
+                }
             }
         });
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        mCallbacks = null;
+        fragment = null;
+        Log.d("debe", "onDetach EditPlFragment");
     }
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        fragment = this;
         setHasOptionsMenu(true);
+        if(savedInstanceState != null){
+            try {
+                String name1 = savedInstanceState.getString(EXTRA_PLAYER1);
+                String name2 = savedInstanceState.getString(EXTRA_PLAYER2);
+                String name3 = savedInstanceState.getString(EXTRA_PLAYER3);
+                String name4 = savedInstanceState.getString(EXTRA_PLAYER4);
+
+                for (GamerDeberc gd : GamerDeberc.getGamers()) {              //identification gamers
+
+                    if (name1.equals(gd.getName())) {
+                        mGamerDeberc1 = gd;
+                    } else if (name2.equals(gd.getName())) {
+                        mGamerDeberc2 = gd;
+                        mTeam1 = new TeamOfGamer(mGamerDeberc1, mGamerDeberc2);
+                    } else if (name3.equals(gd.getName())) {
+                        mGamerDeberc3 = gd;
+                    } else if (name4.equals(gd.getName())) {
+                        mGamerDeberc4 = gd;
+                        mTeam2 = new TeamOfGamer(mGamerDeberc3, mGamerDeberc4);
+                    } else continue;
+
+                }
+
+                mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
+                mTextViewNamesTeam2.setText(mTeam2.getNameOfTeam());
+            }catch (Exception e){}
+        }
     }
 
 
@@ -130,6 +184,18 @@ public class EditPlayersFragment extends Fragment {
                             mGamerDeberc2 = gd;
                             mTeam1 = new TeamOfGamer(mGamerDeberc1, mGamerDeberc2);
                             mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
+                            /*Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {*/
+                                    TeamOfGamer.addTeam(mTeam1, new TeamOfGamer.TeamsDBHelper(getActivity()));
+                              /*  }
+                            });
+                            thread.start();
+                            try {
+                                thread.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }*/
                         }else {//mGlobalPoints.setText(game.getGameWinPoints());
                             mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
                         }
@@ -152,13 +218,26 @@ public class EditPlayersFragment extends Fragment {
                 }
                 for(GamerDeberc gd:GamerDeberc.getGamers()){
                     if(gd.getName().equals(name)){
-                       // Log.d(LOG_TAG_DEBERC, gd.getName());
                         if(mGamerDeberc3 == null){
                             mGamerDeberc3 = gd;
                         }else if(mGamerDeberc4 == null){
                             mGamerDeberc4 = gd;
                             mTeam2 = new TeamOfGamer(mGamerDeberc3, mGamerDeberc4);
                             mTextViewNamesTeam2.setText(mTeam2.getNameOfTeam());
+
+                            Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TeamOfGamer.addTeam(mTeam2,
+                                            new TeamOfGamer.TeamsDBHelper(getActivity()));
+                                }
+                            });
+                            thread.start();
+                            try {
+                                thread.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }else {
                             mTextViewNamesTeam2.setText(mTeam2.getNameOfTeam());
                         }
@@ -210,6 +289,28 @@ public class EditPlayersFragment extends Fragment {
                 mTextViewNamesTeam1.setText("");
             }
         });
+
+        mBtnTeam1Choice = (Button)v.findViewById(R.id.button_team1_choice);
+        mBtnTeam2Choice = (Button)v.findViewById(R.id.button_team2_choice);
+
+        mBtnTeam1Choice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                Intent intent = new Intent(getActivity(), ActivityTeamsList.class);
+                startActivityForResult(intent, 1);*/
+                mCallbacks.onTeam1ChoiceButtonPressed();
+            }
+        });
+        mBtnTeam2Choice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                Intent intent = new Intent(getActivity(), ActivityTeamsList.class);
+                startActivityForResult(intent, 2);*/
+                mCallbacks.onTeam2ChoiceButtonPressed();
+            }
+        });
         return v;
     }
 
@@ -239,4 +340,60 @@ public class EditPlayersFragment extends Fragment {
         mSpinnerForTeam1.setAdapter(mAdapter);
         mSpinnerForTeam2.setAdapter(mAdapter);
     }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        if (mGamerDeberc1 != null){
+            savedInstanceState.putString(EXTRA_PLAYER1, mGamerDeberc1.getName());
+        }
+        if (mGamerDeberc2 != null){
+            savedInstanceState.putString(EXTRA_PLAYER2, mGamerDeberc2.getName());
+        }
+        if (mGamerDeberc3 != null){
+            savedInstanceState.putString(EXTRA_PLAYER3, mGamerDeberc3.getName());
+        }
+        if (mGamerDeberc4 != null){
+            savedInstanceState.putString(EXTRA_PLAYER4, mGamerDeberc4.getName());
+        }
+
+        /*if (mTeam1 != null){
+            savedInstanceState.putString(EXTRA_TEAM1_NAME, mTeam1.getNameOfTeam());
+        }
+        if (mTeam2 != null){
+            savedInstanceState.putString(EXTRA_TEAM2_NAME, mTeam2.getNameOfTeam());
+        }*/
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (data == null){
+            Log.d("debe", "data = null");
+            return;}
+        if(resultCode == RESULT_OK){
+            switch (requestCode){
+                case 1:
+                   int teamId = data.getIntExtra(FragmetListTeams.TEAM_EXTRA, 0);
+                    for(TeamOfGamer teamOfGamer:TeamOfGamer.getTeams()){
+                        if(teamOfGamer.getId() == teamId){
+                            mTeam1 = teamOfGamer;
+                            Log.d("debe", "EPF = " + mTeam1.getNameOfTeam());
+                            mTextViewNamesTeam1.setText(mTeam1.getNameOfTeam());
+                            break;
+                        }
+                    }
+                    break;
+                case 2:
+                    int teamId2 = data.getIntExtra(FragmetListTeams.TEAM_EXTRA, 0);
+                    for(TeamOfGamer teamOfGamer:TeamOfGamer.getTeams()){
+                        if(teamOfGamer.getId() == teamId2){
+                            mTeam2 = teamOfGamer;
+                            mTextViewNamesTeam2.setText(mTeam2.getNameOfTeam());
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
 }

@@ -13,4 +13,7 @@
     <string name="write">Записать</string>
     <string name="reset">Сбросить команды</string>
     <string name="delete_gamers">Очистить список игроков</string>
+    <string name="team1_choice">Выбрать команду 1</string>
+    <string name="team2_choice">Выбрать команду 2</string>
+    <string name="clean_teams_list">Очистить список</string>
 </resources>

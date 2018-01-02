@@ -41,7 +41,6 @@ public class NewGamerNameDialog extends DialogFragment {
                             }
                         });
 
-
                         thread.start();
                         try {
                             thread.join();
